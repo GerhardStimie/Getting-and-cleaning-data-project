@@ -1,0 +1,147 @@
+---
+title: "codebook.Rmd"
+author: "Gerhard Stimie"
+date: "28 November 2018"
+output: 
+        html_document:
+          keep_md: yes
+---
+# Getting and cleaning data project
+## Codebook detailing major data elements involved in project execution
+
+### Source Data
+
+This file provides metadata to support the understanding of major data elements that are used or created in this project.
+
+The project source data can be downloaded from the following location:
+
+https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip
+
+The download is in the form of a zip file which needs to be unzipped (with its directory structure intact) into the "./project_data" subdirectory of the current working directory. 
+
+The files contained in the download are:
+
+```{r}
+list.files("./project_data", recursive = TRUE)
+```
+The files in the "Inertial Signals" subdirectories are not used in the execution of this project as we are focussing on higher level summary data.
+ 
+### Source data background information and metadata
+
+The following files can be perused for information and metadata :
+
+File                | Content
+--------------------|-----------------------------------------------------------
+README.txt          | General background of how the data was sourced
+features_info.txt   | More detail about the 561 variables included in the test and train observation data files. The information obtained from this file will be discussed in more detail below and in the accompanying codebook that gives more detail on the data structures of the source and output files of this project.
+
+### Source data tables used in this project
+
+File|Content
+----|----------------------|-----------------------------------------------------
+./features.txt|Contains the complete list of 561 variables included in the observation vectors (rows) of the train and test observation datasets
+./activity_labels.txt|Contains the 6 activity codes and descriptions used later to translate the activity codes in the observation datasets to user friendly labels
+./train/y_train.txt|Contains a single column of 7352 activity codes indicating which activity was being executed by the subject/person when the the data in each of the observations in the training segment of the data population was collected.
+./train/X_train.txt|This is a 7352 x 561 table where each row contains the values for each variable in a specific observation for a specific subject in the training segment of the data population.
+./train/subject_train.txt|Contains a single column of 7352 subject codes indicating which subject/person the the data in each of the 7352 observations in the training segment of the data population was collected from.
+./test/y_test.txt|Contains a single column of 2947 activity codes indicating which activity was being executed by the subject/person when the the data in each of the observations in the training segment of the data population was collected.
+./test/X_test.txt|This is a 2947 x 561 table where each row contains the values for each variable in a specific observation for a specific subject in the training segment of the data population.
+./test/subject_test.txt|Contains a single column of 2947 subject codes indicating which subject/person the the data in each of the observations in the training segment of the data population was collected from.
+
+###Feature Vectors
+
+The feature vectors available in the observations are:
+
+* tBodyAcc-XYZ
+* tGravityAcc-XYZ
+* tBodyAccJerk-XYZ
+* tBodyGyro-XYZ
+* tBodyGyroJerk-XYZ
+* tBodyAccMag
+* tGravityAccMag
+* tBodyAccJerkMag
+* tBodyGyroMag
+* tBodyGyroJerkMag
+* fBodyAcc-XYZ
+* fBodyAccJerk-XYZ
+* fBodyGyro-XYZ
+* fBodyAccMag
+* fBodyAccJerkMag
+* fBodyGyroMag
+* fBodyGyroJerkMag
+
+Of these, we are not including the low level directional vectors (ending in X or Y or Z) in our analysis. We will therefore only work with the following feature vectors:
+
+* tBodyAccMag
+* tGravityAccMag
+* tBodyAccJerkMag
+* tBodyGyroMag
+* tBodyGyroJerkMag
+* fBodyAccMag
+* fBodyAccJerkMag
+* fBodyGyroMag
+* fBodyGyroJerkMag
+
+we are only interested in the vectors for which a mean and standard deviation variable is available in the source observations. These variables are indicated by "-mean()" and "-std" appended to the vector strings above. FOr instance, we would include tBodyAccMag-mean() and tBodyAccMag-std() in our analysis if they are available in our observation data set.
+
+From these vector names we can see that the featurs included in the strings in different combinations are:
+
+Feature string|Description
+--------------|-----------------------------------------------------------------
+t or f|This indicates the domain of the measurement as either time or frequency
+Body or Gravity|This indicates if the measured signal was produced by body movement or gravitational effect
+Acc or Gyro|This indicates which instrument created the signa that was measured. It was either created by the Gyroscope or the Accellorometer
+Jerk|If present, this indicates that the signal measured was a jerk signal. 
+Mag|If present this indicates that the variable reflects the magnitude of the signal which is the net of the strength of the signal in the x, y and z directions. As this feature is common to all the feature vectors we are interested in, we leave this out of our final tidy data (as it wouldnt add any extra analysis value)
+
+### Tidy dataset variables
+
+The feature strings above therefore actually provide the value set of four variables that we will include in our analysis. We will add to that the mean and standard deviation variable value for the corresponding feature combination:
+
+Variable      | Values
+--------------|-----------------------------------------------------------------
+domain|t,f
+motioncomponent| Body, Gravity
+instrument|Acc, Gyro
+jearkind|Jerk, NA
+mean|Real number calculated mean
+stddev|Real number calculated standard deviation
+
+We will also add to the observations two classifier variables:
+
+Classifier    |Value
+--------------|-----------------------------------------------------------------
+subject|Integer between 1 and 30
+activity|WALKING, WALKING_UPSTAIRS, WALKING_DOWNSTAIRS, SITTING, STANDING, LAYING
+
+The structure of the tidy data is given below:
+
+```{r}
+str(tbl_tidy_obs)
+key(tbl_tidy_obs)
+head(tbl_tidy_obs)
+```
+
+The file is saved to the current working directory as "tidydata.txt". A few lines from this file are:
+
+```{r comment='', echo=FALSE}
+cat(readLines('tidydata.txt',n=10), sep = '\n')
+```
+
+### Summary data file structure
+
+In the final step of the project, a summary file is created that calculates the mean of the two variable "mean" and "stddev" by subject, activity and feauture combination. The structure of the resulting table is:
+
+```{r}
+str(tbl_summary)
+head(tbl_summary)
+```
+
+ The resulting table is written to the file "summarydata.txt" in the current working directory. The first few rows of this file is listed below:
+
+
+```{r comment='', echo=FALSE}
+cat(readLines('summarydata.txt',n=10), sep = '\n')
+```
+ 
+
